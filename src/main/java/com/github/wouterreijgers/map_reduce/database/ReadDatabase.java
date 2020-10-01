@@ -3,6 +3,7 @@ package com.github.wouterreijgers.map_reduce.database;
 import com.mongodb.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -48,6 +49,20 @@ public class ReadDatabase {
         }
         return user_ids;
     }
+
+    public HashMap<String, Byte> readSongScore(){
+        DBCursor cursor = collection.find();
+        HashMap<String, Byte> songs = new HashMap<String, Byte>();
+        int i = 0;
+        for( DBObject dock : collection.find() ) {
+            String song = (String) dock.get( "song" );
+            Byte score = (Byte) dock.get( "like_or_dislike" );
+            songs.put(song, score);
+        }
+        return songs;
+    }
+
+
 
 
 }

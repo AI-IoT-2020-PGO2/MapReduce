@@ -3,6 +3,8 @@ package com.github.wouterreijgers.map_reduce;
 import com.github.wouterreijgers.map_reduce.database.ReadDatabase;
 import com.github.wouterreijgers.map_reduce.database.UserActivityRead;
 
+import java.util.Map;
+
 public class testMongoDB {
     public static void main(String[] args)
     {
@@ -13,6 +15,7 @@ public class testMongoDB {
         for(String e: userActivityRead.getUserids()){
             System.out.println(e);
         }
+        userActivityRead.getFile();
     }
  }
 
