@@ -1,1 +1,3 @@
 # reduce_map
+
+test
