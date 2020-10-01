@@ -16,7 +16,7 @@ public class UserActivityRead {
 
     public File getFile() {
         try{
-            File file = new File("test.txt");
+            File file = new File("user_activity.txt");
             FileWriter writer = new FileWriter(file);
             for(String user:userids)
                 writer.write(user + "\n");

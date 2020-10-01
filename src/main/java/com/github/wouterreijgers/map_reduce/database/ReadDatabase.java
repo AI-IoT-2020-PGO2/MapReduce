@@ -13,6 +13,8 @@ import java.util.List;
 public class ReadDatabase {
     public DB database = null;
     public DBCollection collection = null;
+    public List<String> liked;
+    public List<String> disliked;
 
     public ReadDatabase(){
         MongoClient mongoClient = new MongoClient("localhost", 27017);
@@ -32,10 +34,11 @@ public class ReadDatabase {
      */
     public void fillDatabase(){
         BasicDBObject document = new BasicDBObject();
-        document.put("song", "a song");
-        document.put("user_id", "user02");
+        byte score = 1;
+        document.put("score", score);
+        document.put("userID", "user02");
         document.put("timestamp", "timestamp");
-        document.put("score", "1");
+        document.put("songID", "234");
         collection.insert(document);
     }
 
@@ -44,25 +47,34 @@ public class ReadDatabase {
         List<String> user_ids = new ArrayList<String>();
         int i = 0;
         for( DBObject dock : collection.find() ) {
-            String user_id = (String) dock.get( "user_id" );
+            String user_id = (String) dock.get( "userID" );
             user_ids.add(user_id);
         }
         return user_ids;
     }
 
-    public HashMap<String, Byte> readSongScore(){
+    public void readSongScore(){
         DBCursor cursor = collection.find();
-        HashMap<String, Byte> songs = new HashMap<String, Byte>();
+        this.liked = new ArrayList<>();
+        this.disliked = new ArrayList<>();
         int i = 0;
         for( DBObject dock : collection.find() ) {
-            String song = (String) dock.get( "song" );
-            Byte score = (Byte) dock.get( "like_or_dislike" );
-            songs.put(song, score);
+            String song = (String) dock.get( "songID" );
+            int score = (int) dock.get( "score" );
+            if(score==1) {
+                this.liked.add(song);
+                System.out.println("test");
+            } else {
+                this.disliked.add(song);
+            }
         }
-        return songs;
     }
 
 
-
-
+    public List<String> getLikedSongs() {
+        return this.liked;
+    }
+    public List<String> getDislikedSongs() {
+        return this.disliked;
+    }
 }

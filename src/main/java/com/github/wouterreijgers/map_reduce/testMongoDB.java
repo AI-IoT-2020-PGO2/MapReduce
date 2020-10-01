@@ -1,6 +1,7 @@
 package com.github.wouterreijgers.map_reduce;
 
 import com.github.wouterreijgers.map_reduce.database.ReadDatabase;
+import com.github.wouterreijgers.map_reduce.database.SongScore;
 import com.github.wouterreijgers.map_reduce.database.UserActivityRead;
 
 import java.util.Map;
@@ -16,6 +17,10 @@ public class testMongoDB {
             System.out.println(e);
         }
         userActivityRead.getFile();
+
+        readDatabase.readSongScore();
+        SongScore songScore = new SongScore(readDatabase.getLikedSongs(), readDatabase.getDislikedSongs());
+        songScore.makeFile();
     }
  }
 
