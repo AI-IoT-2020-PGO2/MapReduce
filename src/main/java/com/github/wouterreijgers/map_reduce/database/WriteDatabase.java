@@ -3,46 +3,32 @@ package com.github.wouterreijgers.map_reduce.database;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 
 public class WriteDatabase {
 
-    public void write() {
+    public void updateusers(Map<Integer, Integer> users) {
+        int i = 0;
+        Connection dbConnection = null;
+        PreparedStatement preparedStatement = null;
+        String updateTableSQL = "UPDATE users SET total_votes =? WHERE ID =? ";
         try
         {
-            /*
-             * Connect to DB
-             */
-
-            // create a mysql database connection
-            String myDriver = "org.gjt.mm.mysql.Driver";
-            String myUrl = "jdbc:mysql://localhost/test";
-            Class.forName(myDriver);
-            Connection conn = DriverManager.getConnection(myUrl, "root", "");
-
-            // the mysql insert statement
-            String query = " insert into users (first_name, last_name, date_created, is_admin, num_points)"
-                    + " values (?, ?, ?, ?, ?)";
-
-            // create the mysql insert preparedstatement
-            PreparedStatement preparedStmt = conn.prepareStatement(query);
-            preparedStmt.setString (1, "Barney");
-            preparedStmt.setString (2, "Rubble");
-            preparedStmt.setBoolean(4, false);
-            preparedStmt.setInt    (5, 5000);
-
-            // execute the preparedstatement
-            preparedStmt.execute();
-
-            /*
-             * Close connection
-             */
-
-            conn.close();
+            //dbConnection = getDBConnection();
+            for (Map.Entry<Integer, Integer> e : users.entrySet()){
+                preparedStatement = dbConnection.prepareStatement(updateTableSQL);
+                preparedStatement.setInt(1, e.getValue());
+                preparedStatement.setInt(2, e.getKey());
+                preparedStatement .executeUpdate();
+                i++;
+            }
+            dbConnection.commit();
+            System.out.println(i + " Records updated!");
         }
-        catch (Exception e)
-        {
-            System.err.println("Got an exception!");
-            System.err.println(e.getMessage());
+        catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }
