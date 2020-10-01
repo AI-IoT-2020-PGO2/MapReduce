@@ -9,9 +9,16 @@
     <version>1.0.0</version>
 
     <properties>
+        <!-- Use UTF-8 encoding to prevent warnings -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- Compile against Java 8 to ensure compatibility -->
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
     </properties>
+
+
     <dependencies>
 
         <dependency>
