@@ -1,2 +1,1 @@
-# MapReduce
-Mystery block of PGO2
+# reduce_map
