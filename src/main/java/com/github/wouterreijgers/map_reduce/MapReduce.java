@@ -11,8 +11,8 @@ public class MapReduce {
         int portReadDB = 27017;
 
         String urlWriteDB = "jdbc:mysql://localhost:3306/club_iot";
-        String sqlPassword = "Root";
-        String sqlUser = "root";
+        String sqlPassword = "test";
+        String sqlUser = "test";
         int timeout = 15000; //in ms
 
         System.out.println("Starting MapReduce");

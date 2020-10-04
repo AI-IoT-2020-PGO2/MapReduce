@@ -1,4 +1,4 @@
-# reduce_map
+# reduce map
 
 to run, run "MapReduce", all db settings are also included in this file.
-the code will keep running
+the code will keep running.

@@ -19,10 +19,10 @@ public class ReadDatabase {
     public ReadDatabase(String url, int port){
 
         MongoClient mongoClient = new MongoClient(url, port);
-        this.database = mongoClient.getDB("test-mongo-db");
+        this.database = mongoClient.getDB("Club_iot");
         System.out.println(mongoClient.getDatabaseNames());
-        database.createCollection("votes", null);
-        this.collection = database.getCollection("votes");
+        database.createCollection("Raw", null);
+        this.collection = database.getCollection("Raw");
 
     }
 
