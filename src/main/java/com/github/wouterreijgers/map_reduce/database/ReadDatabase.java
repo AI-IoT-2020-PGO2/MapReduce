@@ -45,7 +45,6 @@ public class ReadDatabase {
     public List<String> readUserActivity(){
         DBCursor cursor = collection.find();
         List<String> user_ids = new ArrayList<String>();
-        int i = 0;
         for( DBObject dock : collection.find() ) {
             String user_id = (String) dock.get( "userID" );
             user_ids.add(user_id);
@@ -57,7 +56,6 @@ public class ReadDatabase {
         DBCursor cursor = collection.find();
         this.liked = new ArrayList<>();
         this.disliked = new ArrayList<>();
-        int i = 0;
         for( DBObject dock : collection.find() ) {
             String song = (String) dock.get( "songID" );
             int score = (int) dock.get( "score" );
