@@ -1,3 +1,3 @@
 # reduce_map
 
-test
+to run, run "MapReduce, all db settings are also included in this file.
