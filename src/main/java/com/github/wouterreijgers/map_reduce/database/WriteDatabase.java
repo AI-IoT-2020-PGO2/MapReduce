@@ -9,13 +9,24 @@ import java.util.Map;
 
 public class WriteDatabase {
 
-    public void updateusers(Map<Integer, Integer> users) {
+    private final String url;
+    private final String username;
+    private final String password;
+
+    public WriteDatabase(String url, String username, String password)
+    {
+        this.url = url != null ? url : "jdbc:mysql://localhost:3306/club_iot";
+        this.username = username != null ? username : "root";
+        this.password = password != null ? password : "";
+    }
+
+    public void updateUsersField(Map<Integer, Integer> users) {
         int i = 0;
         Connection dbConnection = null;
 
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            dbConnection = DriverManager.getConnection("jdbc:mysql://localhost:3306/club_iot","root","");
+            dbConnection = DriverManager.getConnection(this.url, this.username,this.password);
             System.out.println("Connected");
         }catch (SQLException | ClassNotFoundException e){
             System.err.println(e);
@@ -26,6 +37,7 @@ public class WriteDatabase {
         try
         {
             for (Map.Entry<Integer, Integer> e : users.entrySet()){
+                assert (dbConnection != null);
                 preparedStatement = dbConnection.prepareStatement(updateTableSQL);
                 preparedStatement.setInt(1, e.getValue());
                 preparedStatement.setInt(2, e.getKey());

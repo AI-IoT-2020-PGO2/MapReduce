@@ -35,6 +35,7 @@ public class ControlUnit extends Thread {
             String dislikedIn = "dislikedIn.txt";
             String dislikedOut = "dislikedOut.txt";
 
+            // TODO test if writeListToFile works for each list
             // Write lists to their respective files
             FileHandler.writeListToFile(usersIn, userActivity);
             FileHandler.writeListToFile(likedIn, likedSongs);
@@ -50,19 +51,23 @@ public class ControlUnit extends Thread {
             }
             catch (Exception e)  { e.printStackTrace(); }
 
-            // TODO Read entries from written file -> Code will depend on what the output will look like
-            // TODO Place these entries in Maps
+            // TODO test if FileHandler can read the mapreduce output (it splits each line on the last occurrence of a space so spaces in names should be supported)
+            // Output probably looks like:<entry_name> <occurrence_amount>
+            // name/song here 12
+            // another entry here 2
+            // more entries here 5
+            Map<Integer, Integer> userOccurrence = FileHandler.readUserMapFromFile(usersOut);
+            Map<String, Integer> likedSongOccurrence = FileHandler.readMapFromFile(likedOut);
+            Map<String, Integer> dislikedSongOccurrence = FileHandler.readMapFromFile(dislikedOut);
 
-            Map<String, Integer> userOccurrence;
-            Map<String, Integer> likedSongOccurrence;
-            Map<String, Integer> dislikedSongOccurrence;
-
-            // TODO Write entries to SQL database
-            WriteDatabase writeDb = new WriteDatabase();
-
+            // TODO Read url, username & password from a file
+            WriteDatabase writeDb = new WriteDatabase("url_to_db", "root", "");
+            writeDb.updateUsersField(userOccurrence);
+            // TODO create update method for songs
 
             try
             {
+                // TODO find a right amount of sleep time (milliseconds)
                 Thread.sleep(300000);
             }
             catch (InterruptedException e)
