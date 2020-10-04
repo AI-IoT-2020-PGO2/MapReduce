@@ -20,7 +20,7 @@ public class WriteDatabase {
     {
         this.url = url != null ? url : "jdbc:mysql://localhost:3036/club_iot";
         this.username = username != null ? username : "root";
-        this.password = password != null ? password : "";
+        this.password = password != null ? password : "Root";
         this.users_added = new HashSet<Integer>();
         this.songs_added = new HashSet<Integer>();
 
@@ -31,10 +31,9 @@ public class WriteDatabase {
         Connection dbConnection = null;
 
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            dbConnection = DriverManager.getConnection(this.url, this.username,this.password);
-            System.out.println("Connected");
-        }catch (SQLException | ClassNotFoundException e){
+            dbConnection = DriverManager.getConnection("jdbc:mysql://localhost/club_iot?" +
+                    "user=root&password=Root&serverTimezone=UTC");
+        }catch (SQLException e){
             System.err.println(e);
         }
 
@@ -47,11 +46,15 @@ public class WriteDatabase {
             }
             for (Integer songID : songList){
                 if(!songs_added.contains(songID)){
-                    create_song(songID);
+                    create_song(songID, dbConnection);
                     users_added.add(songID);
                 }
-                int like = likes.get(songID);
-                int dislike = dislikes.get(songID);
+                int like = 0;
+                int dislike=0;
+                if(likes.get(songID)!=null)
+                    like = likes.get(songID);
+                if(dislikes.get(songID)!=null)
+                    dislike = dislikes.get(songID);
                 assert (dbConnection != null);
                 preparedStatement = dbConnection.prepareStatement(updateTableSQL);
                 preparedStatement.setInt(1, like - dislike);
@@ -73,10 +76,10 @@ public class WriteDatabase {
         Connection dbConnection = null;
 
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            dbConnection = DriverManager.getConnection(this.url, this.username,this.password);
+            dbConnection = DriverManager.getConnection("jdbc:mysql://localhost/club_iot?" +
+                            "user=root&password=Root&serverTimezone=UTC");
             System.out.println("Connected");
-        }catch (SQLException | ClassNotFoundException e){
+        }catch (SQLException e){
             System.err.println(e);
         }
 
@@ -86,7 +89,7 @@ public class WriteDatabase {
         {
             for (Map.Entry<Integer, Integer> e : users.entrySet()){
                 if(!users_added.contains(e.getKey())){
-                    create_user(e.getKey(), e.getValue());
+                    create_user(e.getKey(), e.getValue(), dbConnection);
                     users_added.add(e.getKey());
                 }
                 assert (dbConnection != null);
@@ -104,13 +107,10 @@ public class WriteDatabase {
         }
     }
 
-    public void create_user(Integer id, Integer votes){
+    public void create_user(Integer id, Integer votes, Connection dbConnection){
         try
         {
             // create a mysql database connection
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection dbConnection = DriverManager.getConnection(this.url, this.username,this.password);
-            System.out.println("Connected");
 
             // the mysql insert statement
             String query = " insert into users (id, total_votes)"
@@ -124,7 +124,6 @@ public class WriteDatabase {
             // execute the preparedstatement
             preparedStmt.execute();
 
-            dbConnection.close();
         }
         catch (Exception e)
         {
@@ -133,13 +132,9 @@ public class WriteDatabase {
         }
     }
 
-    public void create_song(Integer id){
+    public void create_song(Integer id, Connection dbConnection){
         try
         {
-            // create a mysql database connection
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection dbConnection = DriverManager.getConnection(this.url, this.username,this.password);
-            System.out.println("Connected");
 
             // the mysql insert statement
             String query = " insert into processed_votes (played_song_id, total_score, total_votes)"
@@ -155,7 +150,6 @@ public class WriteDatabase {
             // execute the preparedstatement
             preparedStmt.execute();
 
-            dbConnection.close();
         }
         catch (Exception e)
         {

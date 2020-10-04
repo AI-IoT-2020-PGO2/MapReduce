@@ -11,13 +11,15 @@ import java.util.Map;
 
 public class ControlUnit extends Thread {
 
-    String urlReadDB, urlWriteDB;
+    String urlReadDB, urlWriteDB, password, user;
     int portReadDB;
 
-    public ControlUnit(String urlReadDB, int portReadDB, String urlWriteDB){
+    public ControlUnit(String urlReadDB, int portReadDB, String urlWriteDB, String password, String user){
         this.urlReadDB = urlReadDB;
         this.urlWriteDB = urlWriteDB;
         this.portReadDB = portReadDB;
+        this.password = password;
+        this.user=user;
     }
     @Override
     public void run()
@@ -36,7 +38,9 @@ public class ControlUnit extends Thread {
         MapReducer mapReducer_userActivity = new MapReducer(new File(usersIn), new File(usersOut));
         MapReducer mapReducer_liked = new MapReducer(new File(likedIn), new File(likedOut));
         MapReducer mapReducer_disliked = new MapReducer(new File(dislikedIn), new File(dislikedOut));
-        MapReducer mapReducer_SongScore = new MapReducer(new File(songScoreIn), new File(scoreOut));
+
+        WriteDatabase writeDb = new WriteDatabase(this.urlWriteDB, user, password);
+
 
         boolean isRunning = true;
         while (isRunning)
@@ -59,8 +63,8 @@ public class ControlUnit extends Thread {
             // TODO test if writeListToFile works for each list
             // Write lists to their respective files
             FileHandler.writeintListToFile(usersIn, userActivity);
-            //FileHandler.writeintListToFile(likedIn, likedSongs);
-            //FileHandler.writeintListToFile(dislikedIn, dislikedSongs);
+            FileHandler.writeintListToFile(likedIn, likedSongs);
+            FileHandler.writeintListToFile(dislikedIn, dislikedSongs);
 
             File user_count = mapReducer_userActivity.mapReduce();
             if (user_count != null){
@@ -84,7 +88,6 @@ public class ControlUnit extends Thread {
             Map<Integer, Integer> dislikedSongOccurrence = FileHandler.readMapFromFile(disliked_count);
 
             // TODO Read url, username & password from a file
-            WriteDatabase writeDb = new WriteDatabase(null, "root", "");
             writeDb.updateUsersField(userOccurrence);
             writeDb.updateSongScore(likedSongOccurrence, dislikedSongOccurrence, readDb.getSongList());
             // TODO create update method for songs
@@ -92,7 +95,7 @@ public class ControlUnit extends Thread {
             try
             {
                 // TODO find a right amount of sleep time (milliseconds)
-                Thread.sleep(300000);
+                Thread.sleep(30000);
             }
             catch (InterruptedException e)
             {
