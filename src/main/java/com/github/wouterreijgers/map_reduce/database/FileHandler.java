@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.stream.Stream;
 
 public class FileHandler {
@@ -71,6 +72,23 @@ public class FileHandler {
             e.printStackTrace();
         }
         return entries;
+    }
+
+    public static String configReader(String arg) {
+        try {
+            Scanner myReader = new Scanner(new File("src/main/java/com/github/wouterreijgers/map_reduce/CONFIG.txt"));
+            while (myReader.hasNextLine()) {
+                String data = myReader.nextLine();
+                String[] conf = data.split(" = ");
+                if (conf[0].equals(arg))
+                    return conf[1];
+            }
+            return "no such config";
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return "file not found";
     }
 
     public static Map<Integer, Integer> readUserMapFromFile(File input)

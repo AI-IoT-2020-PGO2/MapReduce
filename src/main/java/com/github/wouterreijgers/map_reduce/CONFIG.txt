@@ -1,0 +1,13 @@
+#GENERAL
+TIMEOUT = 15000
+
+#SQL
+SQL.URL = jdbc:mysql://localhost:3306/club_iot
+SQL.USER = root
+SQL.PASSWORD = Root
+
+#MONGODB
+MONGO.PORT = 27017
+MONGO.DB = test-mongo-db
+MONGO.URL = localhost
+MONGO.COLLECTION = votes

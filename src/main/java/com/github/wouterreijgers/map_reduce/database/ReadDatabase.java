@@ -19,10 +19,10 @@ public class ReadDatabase {
     public ReadDatabase(String url, int port){
 
         MongoClient mongoClient = new MongoClient(url, port);
-        this.database = mongoClient.getDB("votes");
+        this.database = mongoClient.getDB(FileHandler.configReader("MONGO.DB"));
         System.out.println(mongoClient.getDatabaseNames());
-        database.createCollection("vote", null);
-        this.collection = database.getCollection("vpte");
+        database.createCollection(FileHandler.configReader("MONGO.COLLECTION"), null);
+        this.collection = database.getCollection(FileHandler.configReader("MONGO.COLLECTION"));
 
     }
 
