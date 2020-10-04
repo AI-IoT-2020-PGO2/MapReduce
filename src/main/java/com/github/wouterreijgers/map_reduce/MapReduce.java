@@ -16,7 +16,7 @@ public class MapReduce {
         int timeout = 30000; //in ms
 
         System.out.println("Starting MapReduce");
-        ControlUnit control = new ControlUnit(urlReadDB, portReadDB, urlWriteDB, sqlPassword, sqlUser);
+        ControlUnit control = new ControlUnit(urlReadDB, portReadDB, urlWriteDB, sqlPassword, sqlUser, timeout);
         control.start();
     }
 

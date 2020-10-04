@@ -12,14 +12,15 @@ import java.util.Map;
 public class ControlUnit extends Thread {
 
     String urlReadDB, urlWriteDB, password, user;
-    int portReadDB;
+    int portReadDB, timeout;
 
-    public ControlUnit(String urlReadDB, int portReadDB, String urlWriteDB, String password, String user){
+    public ControlUnit(String urlReadDB, int portReadDB,  String urlWriteDB, String password, String user, int timeout){
         this.urlReadDB = urlReadDB;
         this.urlWriteDB = urlWriteDB;
         this.portReadDB = portReadDB;
         this.password = password;
         this.user=user;
+        this.timeout = timeout;
     }
     @Override
     public void run()
@@ -95,7 +96,7 @@ public class ControlUnit extends Thread {
             try
             {
                 // TODO find a right amount of sleep time (milliseconds)
-                Thread.sleep(30000);
+                Thread.sleep(timeout);
             }
             catch (InterruptedException e)
             {

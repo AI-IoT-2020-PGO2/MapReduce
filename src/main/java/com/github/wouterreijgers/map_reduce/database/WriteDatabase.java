@@ -32,7 +32,7 @@ public class WriteDatabase {
 
         try {
             dbConnection = DriverManager.getConnection("jdbc:mysql://localhost/club_iot?" +
-                    "user=root&password=Root&serverTimezone=UTC");
+                    "user="+username+"&password="+password+"&serverTimezone=UTC");
         }catch (SQLException e){
             System.err.println(e);
         }
@@ -77,7 +77,7 @@ public class WriteDatabase {
 
         try {
             dbConnection = DriverManager.getConnection("jdbc:mysql://localhost/club_iot?" +
-                            "user=root&password=Root&serverTimezone=UTC");
+                            "user="+username+"&password="+password+"&serverTimezone=UTC");
             System.out.println("Connected");
         }catch (SQLException e){
             System.err.println(e);
