@@ -1,60 +1,90 @@
 package com.github.wouterreijgers.map_reduce;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+import scala.Tuple2;
 
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
 
 /**
  * This class will use the database to fetch data and perform map reducing
  * When complete, the results will be written to another database
  */
 public class MapReducer {
+    public File out;
+    public File in;
 
-    public static class TextMapper extends Mapper<Object, Text, Text, IntWritable>{
-
-        private final static IntWritable one = new IntWritable(1);
-        private Text word = new Text();
-
-        public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-            word.set( key.toString() );
-            context.write(word, one);
-        }
+    public MapReducer(File in, File out){
+        this.out = out;
+        this.in = in;
+        System.out.println();
+        System.setProperty("hadoop.home.dir", System.getProperty("user.dir"));
     }
 
-    public static class IntSumReducer extends Reducer<Text,IntWritable,Text,IntWritable> {
+    public File mapReduce(){
+        SparkConf conf = new SparkConf().setMaster("local[*]").setAppName("SparkFileSumApp");
+        conf.set("spark.driver.bindAddress", "127.0.0.1");
+        JavaSparkContext sc = new JavaSparkContext(conf);
 
-        private IntWritable result = new IntWritable();
+        List<Integer> data = Arrays.asList(1, 2, 3, 4, 5);
+        JavaRDD<Integer> distData = sc.parallelize(data);
 
-        public void reduce(Text key, Iterable<IntWritable> values, Context context
-        ) throws IOException, InterruptedException {
-            int sum = 0;
-            for (IntWritable val : values) {
-                sum += val.get();
+        deleteDirectory(out);
+        JavaRDD<String> textFile = sc.textFile(in.getPath());
+        JavaPairRDD<String, Integer> counts = textFile
+                .flatMap(s -> Arrays.asList(s.split("\n")).iterator())
+                .mapToPair(word -> new Tuple2<>(word, 1))
+                .reduceByKey(Integer::sum);
+        counts.saveAsTextFile(out.getPath());
+        try{
+            return createFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean deleteDirectory(File directoryToBeDeleted) {
+        File[] allContents = directoryToBeDeleted.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                deleteDirectory(file);
             }
-            result.set(sum);
-            context.write(key, result);
         }
+        return directoryToBeDeleted.delete();
     }
 
-    public void perfromMapReduce(String inputFileName, String outputFileName) throws Exception {
-        org.apache.hadoop.conf.Configuration conf = new Configuration();
-        Job job = Job.getInstance(conf, "word count");
-        job.setJarByClass(MapReducer.class);
-        job.setMapperClass(TextMapper.class);
-        job.setCombinerClass(MapReducer.IntSumReducer.class);
-        job.setReducerClass(MapReducer.IntSumReducer.class);
-        job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(IntWritable.class);
-        FileInputFormat.addInputPath(job, new Path(inputFileName));
-        FileOutputFormat.setOutputPath(job, new Path(outputFileName));
-        System.exit(job.waitForCompletion(true) ? 0 : 1);
+    public File createFile() throws IOException {
+        File output = new File(out.getPath()+"/"+in.getName());
+        output.createNewFile();
+        FileWriter myWriter = new FileWriter(output);
+        for(File f:out.listFiles()) {
+            try {
+                Scanner myReader = new Scanner(f);
+                while (myReader.hasNextLine()) {
+                    String data = myReader.nextLine();
+                    if (data.startsWith("("))
+                        myWriter.write(data.substring(1, data.length() - 1)+"\n");
+                    System.out.println(data);
+                }
+                myReader.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        myWriter.close();
+        return output;
+
+
     }
 }
+

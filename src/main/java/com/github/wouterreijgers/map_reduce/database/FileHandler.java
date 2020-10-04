@@ -24,7 +24,21 @@ public class FileHandler {
         }
     }
 
-    public static Map<String, Integer> readMapFromFile(String filename)
+    public static void writeintListToFile(String filename, List<Integer> list)
+    {
+        try{
+            File file = new File(filename);
+            FileWriter writer = new FileWriter(file);
+            for (int element : list)
+                writer.write(element + "\n");
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static Map<String, Integer> readMapFromFile(File filename)
     {
         Map<String, Integer> entries = new HashMap<>();
         try{
@@ -33,7 +47,7 @@ public class FileHandler {
 
             String line;
             while ((line = br.readLine()) != null)   {
-                int index = line.lastIndexOf(" ");
+                int index = line.lastIndexOf(",");
                 if (index < line.length()-1)
                 {
                     String entry = line.substring(0, index);
@@ -57,16 +71,16 @@ public class FileHandler {
         return entries;
     }
 
-    public static Map<Integer, Integer> readUserMapFromFile(String filename)
+    public static Map<Integer, Integer> readUserMapFromFile(File input)
     {
         Map<Integer, Integer> entries = new HashMap<>();
         try{
-            FileInputStream fstream = new FileInputStream(filename);
+            FileInputStream fstream = new FileInputStream(input);
             BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
 
             String line;
             while ((line = br.readLine()) != null)   {
-                int index = line.lastIndexOf(" ");
+                int index = line.lastIndexOf(",");
                 if (index < line.length()-1)
                 {
                     String idStr = line.substring(0, index);

@@ -5,6 +5,7 @@ import com.mongodb.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 /**
  * This class will read a mongoDB database
@@ -13,8 +14,8 @@ import java.util.List;
 public class ReadDatabase {
     public DB database = null;
     public DBCollection collection = null;
-    public List<String> liked;
-    public List<String> disliked;
+    public List<Integer> liked;
+    public List<Integer> disliked;
 
     public ReadDatabase(){
         MongoClient mongoClient = new MongoClient("localhost", 27017);
@@ -33,20 +34,24 @@ public class ReadDatabase {
      * This function will add an entry to the DB every time it's executed
      */
     public void fillDatabase(){
+        Random rn = new Random();
+        int id = rn.nextInt(10) + 1;
+        int song = rn.nextInt(10) + 1;
+
         BasicDBObject document = new BasicDBObject();
         byte score = 1;
         document.put("score", score);
-        document.put("userID", "user02");
+        document.put("userID", id);
         document.put("timestamp", "timestamp");
-        document.put("songID", "234");
+        document.put("songID", song);
         collection.insert(document);
     }
 
-    public List<String> readUserActivity(){
+    public List<Integer> readUserActivity(){
         DBCursor cursor = collection.find();
-        List<String> user_ids = new ArrayList<String>();
+        List<Integer> user_ids = new ArrayList<Integer>();
         for( DBObject dock : collection.find() ) {
-            String user_id = (String) dock.get( "userID" );
+            int user_id = (int) dock.get( "userID" );
             user_ids.add(user_id);
         }
         return user_ids;
@@ -57,7 +62,7 @@ public class ReadDatabase {
         this.liked = new ArrayList<>();
         this.disliked = new ArrayList<>();
         for( DBObject dock : collection.find() ) {
-            String song = (String) dock.get( "songID" );
+            int song = (Integer) dock.get( "songID" );
             int score = (int) dock.get( "score" );
             if(score==1) {
                 this.liked.add(song);
@@ -69,10 +74,10 @@ public class ReadDatabase {
     }
 
 
-    public List<String> getLikedSongs() {
+    public List<Integer> getLikedSongs() {
         return this.liked;
     }
-    public List<String> getDislikedSongs() {
+    public List<Integer> getDislikedSongs() {
         return this.disliked;
     }
 }

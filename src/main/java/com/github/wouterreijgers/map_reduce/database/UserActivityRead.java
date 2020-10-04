@@ -4,21 +4,21 @@ import java.io.*;
 import java.util.List;
 
 public class UserActivityRead {
-    public List<String> userids;
+    public List<Integer> userids;
 
-    public UserActivityRead(List<String> userids){
+    public UserActivityRead(List<Integer> userids){
         this.userids = userids;
     }
 
-    public List<String> getUserids() {
+    public List<Integer> getUserids() {
         return userids;
     }
 
     public File getFile() {
         try{
-            File file = new File("user_activity.txt");
+            File file = new File("usersIn.txt");
             FileWriter writer = new FileWriter(file);
-            for(String user:userids)
+            for(int user:userids)
                 writer.write(user + "\n");
             writer.close();
             return file;
