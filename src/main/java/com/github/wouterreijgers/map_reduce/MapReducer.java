@@ -44,7 +44,7 @@ public class MapReducer {
         }
     }
 
-    public static void main(String[] args) throws Exception {
+    public void perfromMapReduce(String inputFileName, String outputFileName) throws Exception {
         org.apache.hadoop.conf.Configuration conf = new Configuration();
         Job job = Job.getInstance(conf, "word count");
         job.setJarByClass(MapReducer.class);
@@ -53,8 +53,8 @@ public class MapReducer {
         job.setReducerClass(MapReducer.IntSumReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
-        FileInputFormat.addInputPath(job, new Path("input.txt"));
-        FileOutputFormat.setOutputPath(job, new Path("output.txt"));
+        FileInputFormat.addInputPath(job, new Path(inputFileName));
+        FileOutputFormat.setOutputPath(job, new Path(outputFileName));
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 }
