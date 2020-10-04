@@ -2,10 +2,7 @@ package com.github.wouterreijgers.map_reduce.database;
 
 import com.mongodb.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * This class will read a mongoDB database
@@ -16,9 +13,12 @@ public class ReadDatabase {
     public DBCollection collection = null;
     public List<Integer> liked;
     public List<Integer> disliked;
+    public HashSet<Integer> songList;
 
-    public ReadDatabase(){
-        MongoClient mongoClient = new MongoClient("localhost", 27017);
+
+    public ReadDatabase(String url, int port){
+
+        MongoClient mongoClient = new MongoClient(url, port);
         this.database = mongoClient.getDB("test-mongo-db");
         System.out.println(mongoClient.getDatabaseNames());
         database.createCollection("votes", null);
@@ -48,7 +48,6 @@ public class ReadDatabase {
     }
 
     public List<Integer> readUserActivity(){
-        DBCursor cursor = collection.find();
         List<Integer> user_ids = new ArrayList<Integer>();
         for( DBObject dock : collection.find() ) {
             int user_id = (int) dock.get( "userID" );
@@ -58,21 +57,23 @@ public class ReadDatabase {
     }
 
     public void readSongScore(){
-        DBCursor cursor = collection.find();
         this.liked = new ArrayList<>();
         this.disliked = new ArrayList<>();
+        this.songList = new HashSet<>();
         for( DBObject dock : collection.find() ) {
             int song = (Integer) dock.get( "songID" );
             int score = (int) dock.get( "score" );
+            songList.add(song);
             if(score==1) {
                 this.liked.add(song);
-                System.out.println("test");
+                System.out.println(song+","+score);
             } else {
                 this.disliked.add(song);
             }
         }
     }
 
+    public HashSet<Integer> getSongList(){return this.songList;}
 
     public List<Integer> getLikedSongs() {
         return this.liked;

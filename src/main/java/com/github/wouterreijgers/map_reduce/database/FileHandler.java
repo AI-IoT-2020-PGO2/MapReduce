@@ -1,5 +1,7 @@
 package com.github.wouterreijgers.map_reduce.database;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.*;
 import java.net.InetAddress;
 import java.nio.file.Files;
@@ -38,9 +40,9 @@ public class FileHandler {
     }
 
 
-    public static Map<String, Integer> readMapFromFile(File filename)
+    public static Map<Integer, Integer> readMapFromFile(File filename)
     {
-        Map<String, Integer> entries = new HashMap<>();
+        Map<Integer, Integer> entries = new HashMap<>();
         try{
             FileInputStream fstream = new FileInputStream(filename);
             BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
@@ -50,7 +52,7 @@ public class FileHandler {
                 int index = line.lastIndexOf(",");
                 if (index < line.length()-1)
                 {
-                    String entry = line.substring(0, index);
+                    String entryStr = line.substring(0, index);
                     String scoreStr = line.substring(index + 1);
                     int score = -1;
                     try
@@ -60,7 +62,7 @@ public class FileHandler {
                     catch (NumberFormatException exc) { exc.printStackTrace(); }
 
                     if (score != -1)
-                        entries.put( entry, score );
+                        entries.put( Integer.parseInt(entryStr), score );
                 }
             }
 
@@ -106,4 +108,22 @@ public class FileHandler {
         return entries;
     }
 
+    public static void concatFiles(String path1, String path2, String destination) throws IOException {
+        // Files to read
+        File file1 = new File(path1);
+        File file2 = new File(path2);
+
+        // File to write
+        File file3 = new File(destination);
+
+        // Read the file as string
+        String file1Str = FileUtils.readFileToString(file1);
+        String file2Str = FileUtils.readFileToString(file2);
+
+        // Write the file
+        FileUtils.write(file3, file1Str);
+        FileUtils.write(file3, file2Str, true); // true for append
+    }
 }
+
+

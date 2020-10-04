@@ -5,11 +5,20 @@ import com.github.wouterreijgers.map_reduce.database.ReadDatabase;
 import com.github.wouterreijgers.map_reduce.database.WriteDatabase;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 public class ControlUnit extends Thread {
 
+    String urlReadDB, urlWriteDB;
+    int portReadDB;
+
+    public ControlUnit(String urlReadDB, int portReadDB, String urlWriteDB){
+        this.urlReadDB = urlReadDB;
+        this.urlWriteDB = urlWriteDB;
+        this.portReadDB = portReadDB;
+    }
     @Override
     public void run()
     {
@@ -20,19 +29,23 @@ public class ControlUnit extends Thread {
         String likedOut = "count_liked/";
         String dislikedIn = "dislikedIn.txt";
         String dislikedOut = "count_disliked/";
+        String songScoreIn = "songScoreIn.txt";
+        String scoreOut = "songScore/";
 
         //Setting up the mapReducer
         MapReducer mapReducer_userActivity = new MapReducer(new File(usersIn), new File(usersOut));
         MapReducer mapReducer_liked = new MapReducer(new File(likedIn), new File(likedOut));
         MapReducer mapReducer_disliked = new MapReducer(new File(dislikedIn), new File(dislikedOut));
+        MapReducer mapReducer_SongScore = new MapReducer(new File(songScoreIn), new File(scoreOut));
 
         boolean isRunning = true;
         while (isRunning)
         {
-            ReadDatabase readDb = new ReadDatabase();
+            ReadDatabase readDb = new ReadDatabase(urlReadDB, portReadDB);
 
             // Get list of user IDs
             List<Integer> userActivity = readDb.readUserActivity();
+
 
             // Update internal lists (liked & disliked)
             readDb.readSongScore();
@@ -46,35 +59,34 @@ public class ControlUnit extends Thread {
             // TODO test if writeListToFile works for each list
             // Write lists to their respective files
             FileHandler.writeintListToFile(usersIn, userActivity);
-            FileHandler.writeintListToFile(likedIn, likedSongs);
-            FileHandler.writeintListToFile(dislikedIn, dislikedSongs);
+            //FileHandler.writeintListToFile(likedIn, likedSongs);
+            //FileHandler.writeintListToFile(dislikedIn, dislikedSongs);
 
             File user_count = mapReducer_userActivity.mapReduce();
             if (user_count != null){
                 System.out.println("User count succeeded, result stored in: "+user_count.getPath());
             }
-            File liked_count = mapReducer_userActivity.mapReduce();
-            if (user_count != null){
-                System.out.println("User count succeeded, result stored in: "+user_count.getPath());
+            File liked_count = mapReducer_liked.mapReduce();
+            if (liked_count != null){
+                System.out.println("Liked count succeeded, result stored in: "+liked_count.getPath());
             }
-            File disliked_count = mapReducer_userActivity.mapReduce();
-            if (user_count != null){
-                System.out.println("User count succeeded, result stored in: "+user_count.getPath());
+            File disliked_count = mapReducer_disliked.mapReduce();
+            if (disliked_count != null){
+                System.out.println("Disliked count succeeded, result stored in: "+disliked_count.getPath());
             }
-
-
             // TODO test if FileHandler can read the mapreduce output (it splits each line on the last occurrence of a space so spaces in names should be supported)
             // Output probably looks like:<entry_name> <occurrence_amount>
             // name/song here 12
             // another entry here 2
             // more entries here 5
             Map<Integer, Integer> userOccurrence = FileHandler.readUserMapFromFile(user_count);
-            Map<String, Integer> likedSongOccurrence = FileHandler.readMapFromFile(liked_count);
-            Map<String, Integer> dislikedSongOccurrence = FileHandler.readMapFromFile(disliked_count);
+            Map<Integer, Integer> likedSongOccurrence = FileHandler.readMapFromFile(liked_count);
+            Map<Integer, Integer> dislikedSongOccurrence = FileHandler.readMapFromFile(disliked_count);
 
             // TODO Read url, username & password from a file
-            WriteDatabase writeDb = new WriteDatabase("url_to_db", "root", "");
+            WriteDatabase writeDb = new WriteDatabase(null, "root", "");
             writeDb.updateUsersField(userOccurrence);
+            writeDb.updateSongScore(likedSongOccurrence, dislikedSongOccurrence, readDb.getSongList());
             // TODO create update method for songs
 
             try

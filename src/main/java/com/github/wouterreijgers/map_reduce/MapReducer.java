@@ -31,9 +31,11 @@ public class MapReducer {
     }
 
     public File mapReduce(){
+
         SparkConf conf = new SparkConf().setMaster("local[*]").setAppName("SparkFileSumApp");
         conf.set("spark.driver.bindAddress", "127.0.0.1");
         JavaSparkContext sc = new JavaSparkContext(conf);
+
 
         List<Integer> data = Arrays.asList(1, 2, 3, 4, 5);
         JavaRDD<Integer> distData = sc.parallelize(data);
@@ -46,13 +48,14 @@ public class MapReducer {
                 .reduceByKey(Integer::sum);
         counts.saveAsTextFile(out.getPath());
         try{
+            sc.stop();
             return createFile();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        sc.stop();
         return null;
     }
-
     public boolean deleteDirectory(File directoryToBeDeleted) {
         File[] allContents = directoryToBeDeleted.listFiles();
         if (allContents != null) {
@@ -74,7 +77,7 @@ public class MapReducer {
                     String data = myReader.nextLine();
                     if (data.startsWith("("))
                         myWriter.write(data.substring(1, data.length() - 1)+"\n");
-                    System.out.println(data);
+                    //System.out.println(data);
                 }
                 myReader.close();
             } catch (FileNotFoundException e) {
