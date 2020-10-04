@@ -59,6 +59,7 @@ public class ReadDatabase {
     public void readSongScore(){
         this.liked = new ArrayList<>();
         this.disliked = new ArrayList<>();
+        this.songList = null;
         this.songList = new HashSet<>();
         for( DBObject dock : collection.find() ) {
             int song = (Integer) dock.get( "songID" );

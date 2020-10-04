@@ -47,7 +47,7 @@ public class WriteDatabase {
             for (Integer songID : songList){
                 if(!songs_added.contains(songID)){
                     create_song(songID, dbConnection);
-                    users_added.add(songID);
+                    songs_added.add(songID);
                 }
                 int like = 0;
                 int dislike=0;
